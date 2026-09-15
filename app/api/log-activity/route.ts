@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { appendActivity } from "../../../../lib/sheets";
+import { appendActivity } from "@/lib/sheets";
 
 export async function POST(req: NextRequest) {
   try {
