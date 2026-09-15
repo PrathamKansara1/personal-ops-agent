@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Personal Ops Agent
 
-## Getting Started
+A free, serverless AI agent that:
 
-First, run the development server:
+- Reads my Google Calendar and a Sheets-based activity log (bills, workouts, etc.)
+- Summarizes the day using Gemini (Google AI Studio)
+- Sends me a morning briefing via Telegram
+- Can be triggered manually from iPhone Shortcuts
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Architecture
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Frontend / API**: Next.js (App Router) on Vercel (free tier)
+- **Scheduler**: Vercel Cron (daily at 7 AM IST)
+- **Data**:
+  - Google Calendar API (events)
+  - Google Sheets (bills & activities)
+- **LLM**: Gemini via Google AI Studio (free tier)
+- **Notifications**: Telegram Bot API (free)
+- **iPhone integration**: Apple Shortcuts (log bills/activities, trigger briefs)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Local Setup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Copy `.env.example` to `.env.local` and fill in:
+   - Google service account (`GOOGLE_CLIENT_EMAIL`, `GOOGLE_PRIVATE_KEY`)
+   - Google Calendar ID (`GOOGLE_CALENDAR_ID`)
+   - Google Sheets ID & tab (`GOOGLE_SHEETS_ID`, `GOOGLE_SHEETS_TAB`)
+   - Gemini API key (`GEMINI_API_KEY`)
+   - Telegram bot token & chat ID (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`)
+   - Cron secret (`CRON_SECRET`)
+3. Run dev server:
+   ```bash
+   npm run dev
+   ```
+4. Test:
+   ```bash
+   curl "http://localhost:3000/api/cron/daily-brief?secret=YOUR_CRON_SECRET"
+   ```
 
-## Learn More
+## Deployment
 
-To learn more about Next.js, take a look at the following resources:
+1. Push to GitHub.
+2. Import repo in Vercel.
+3. Add all environment variables in Vercel settings.
+4. Enable cron (configured in `vercel.json`).
+5. Test deployed endpoint:
+   ```bash
+   curl "https://your-app.vercel.app/api/cron/daily-brief?secret=YOUR_CRON_SECRET"
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## iOS Shortcuts
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Log Bill**: POST to `/api/log-activity` with `type=bill`, `amount`, `category`, `notes`.
+- **Log Activity**: POST to `/api/log-activity` with `type=activity`.
+- **Send My Briefing Now**: GET `/api/cron/daily-brief?secret=...` and show notification.
 
-## Deploy on Vercel
+## Resume blurb
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+> **Personal Ops Agent (iOS + Telegram)** – Built a $0 agentic system that aggregates Google Calendar and a Sheets-based activity log, summarizes the day using Gemini Flash, and delivers a morning briefing via Telegram. Implemented with Next.js on Vercel (cron), Google APIs, Telegram Bot API, and iOS Shortcuts.
